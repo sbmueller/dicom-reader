@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+
+import argparse
+from dicom_reader import DicomData
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Read DICOM images.")
+    parser.add_argument(
+        "--export",
+        dest="output_folder",
+        help="Instead of plotting images, export PNGs to output_folder",
+    )
+    parser.add_argument(
+        "input_folder",
+        metavar="folder",
+        action="store",
+        help="Path to DICOM image folder",
+    )
+    args = parser.parse_args()
+
+    dicom = DicomData(args.input_folder)
+    print(dicom.get_metadata())
+
+    if args.output_folder:
+        print("Exporting to PNG images")
+        dicom.export_to_folder(args.output_folder)
+    else:
+        input("Press any key to start plotting and to jump to the next image...")
+        dicom.plot_images()
