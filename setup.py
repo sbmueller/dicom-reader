@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="dicom-reader",
-    version="0.1",
+    version="1.0.0",
     description="Read medical DICOM images and their meta data",
     url="https://github.com/sbmueller/dicom-reader",
     author="Sebastian Müller",

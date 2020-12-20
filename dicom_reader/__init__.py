@@ -16,17 +16,21 @@ class DicomData:
     :param path: Path of the folder containing DICOM data
     """
 
+    DPI = 96
+
     def __init__(self, path: str):
         """C'tor."""
         path = os.path.abspath(path)
         if not os.path.exists(path):
-            raise ValueError(f"Path does not exist: {path}")
+            raise FileNotFoundError(f"Path does not exist: {path}")
         self.path = path
         self._files = [
             os.path.join(self.path, f)
             for f in sorted(os.listdir(self.path))
             if os.path.isfile(os.path.join(self.path, f))
         ]
+        if len(self._files) == 0:
+            raise FileNotFoundError("No files found in provided path")
 
     def get_metadata(self) -> str:
         """Return general meta data of whole DICOM data set."""
@@ -68,16 +72,23 @@ class DicomData:
         :param output_folder: Location for exported PNGs
         """
         output_folder = os.path.abspath(output_folder)
+        if not os.path.exists(output_folder):
+            try:
+                os.mkdir(output_folder)
+            except OSError:
+                raise FileNotFoundError("Output folder couldn't be created")
         with open(os.path.join(output_folder, "metadata.txt"), "w") as f:
             f.write(self.get_metadata())
         for fpath in tqdm(self._files):
             ds = dcmread(fpath)
             _, filename = os.path.split(fpath)
             filename += ".png"
-            fig = plt.figure(frameon=False, figsize=(ds.Columns // 96, ds.Rows // 96))
+            fig = plt.figure(
+                frameon=False, figsize=(ds.Columns // self.DPI, ds.Rows // self.DPI)
+            )
             ax = plt.Axes(fig, [0.0, 0, 1.0, 1.0])
             ax.set_axis_off()
             fig.add_axes(ax)
             ax.imshow(ds.pixel_array, cmap=plt.cm.gray)
-            fig.savefig(os.path.join(output_folder, filename), dpi=96)
+            fig.savefig(os.path.join(output_folder, filename), dpi=self.DPI)
             plt.close()
