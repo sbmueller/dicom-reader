@@ -7,7 +7,7 @@ setup(
     url="https://github.com/sbmueller/dicom-reader",
     author="Sebastian Müller",
     author_email="gsenpo@gmail.com",
-    license="MIT",
+    license="GPLv3",
     packages=["dicom_reader"],
     zip_safe=False,
     install_requires=["pydicom", "matplotlib", "tqdm"],
